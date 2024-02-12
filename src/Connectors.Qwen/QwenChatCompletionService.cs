@@ -12,13 +12,13 @@ public sealed class QwenChatCompletionService : IChatCompletionService
 {
     private readonly DashScopeClient _dashScopeClient;
     private readonly string _modelId;
-    private readonly Dictionary<string, object?> _attribues = new();
+    private readonly Dictionary<string, object?> _attribues = [];
 
     public QwenChatCompletionService(
         IOptions<QwenClientOptions> options,
-        IHttpClientFactory httpClientFactory)
+        HttpClient httpClient)
     {
-        _dashScopeClient = new(options.Value.ApiKey, httpClientFactory.CreateClient());
+        _dashScopeClient = new(options.Value.ApiKey, httpClient);
         _modelId = options.Value.ModelId;
         _attribues.Add(AIServiceExtensions.ModelIdKey, _modelId);
     }
