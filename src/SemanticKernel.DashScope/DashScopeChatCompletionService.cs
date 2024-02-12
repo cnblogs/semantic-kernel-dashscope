@@ -8,13 +8,13 @@ using Sdcb.DashScope.TextGeneration;
 
 namespace Cnblogs.SemanticKernel.DashScope;
 
-public sealed class QwenChatCompletionService : IChatCompletionService
+public sealed class DashScopeChatCompletionService : IChatCompletionService
 {
     private readonly DashScopeClient _dashScopeClient;
     private readonly string _modelId;
     private readonly Dictionary<string, object?> _attribues = [];
 
-    public QwenChatCompletionService(
+    public DashScopeChatCompletionService(
         IOptions<DashScopeClientOptions> options,
         HttpClient httpClient)
     {
