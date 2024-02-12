@@ -6,7 +6,7 @@ using Microsoft.SemanticKernel.Services;
 using Sdcb.DashScope;
 using Sdcb.DashScope.TextGeneration;
 
-namespace Connectors.Qwen;
+namespace Cnblogs.SemanticKernel.DashScope;
 
 public sealed class QwenChatCompletionService : IChatCompletionService
 {
@@ -15,7 +15,7 @@ public sealed class QwenChatCompletionService : IChatCompletionService
     private readonly Dictionary<string, object?> _attribues = [];
 
     public QwenChatCompletionService(
-        IOptions<QwenClientOptions> options,
+        IOptions<DashScopeClientOptions> options,
         HttpClient httpClient)
     {
         _dashScopeClient = new(options.Value.ApiKey, httpClient);
