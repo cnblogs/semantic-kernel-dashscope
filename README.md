@@ -1,2 +1,2 @@
-# semantic-kernel-qwen
-Semantic Kernel Connector to Qwen
+# SemanticKernel.DashScope
+Semantic Kernel Connector to DashScope
