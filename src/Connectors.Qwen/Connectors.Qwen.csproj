@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App"></FrameworkReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.3.0" />
+    <PackageReference Include="Sdcb.DashScope" Version="1.0.1" />
   </ItemGroup>
 
 </Project>
