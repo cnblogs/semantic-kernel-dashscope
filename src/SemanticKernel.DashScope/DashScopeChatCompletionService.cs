@@ -20,6 +20,7 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService
     {
         _dashScopeClient = new(options.Value.ApiKey, httpClient);
         _modelId = options.Value.ModelId;
+        Console.WriteLine("_modelId: " + _modelId);
         _attribues.Add(AIServiceExtensions.ModelIdKey, _modelId);
     }
 
