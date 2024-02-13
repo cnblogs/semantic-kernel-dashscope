@@ -28,5 +28,4 @@ public static class DashScopeServiceCollectionExtensions
         builder.Services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
         return builder;
     }
-
 }

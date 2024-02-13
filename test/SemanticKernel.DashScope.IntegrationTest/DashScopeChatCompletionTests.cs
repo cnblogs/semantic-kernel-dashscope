@@ -3,19 +3,11 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
-using Xunit.Abstractions;
 
 namespace SemanticKernel.DashScope.IntegrationTest;
 
 public class DashScopeChatCompletionTests
 {
-    private readonly ITestOutputHelper _testOutput;
-
-    public DashScopeChatCompletionTests(ITestOutputHelper testOutput)
-    {
-        _testOutput = testOutput;
-    }
-
     [Fact]
     public async Task ChatCompletion_InvokePromptAsync_WorksCorrectly()
     {
@@ -25,9 +17,18 @@ public class DashScopeChatCompletionTests
         builder.AddDashScopeChatCompletion();
         var kernel = builder.Build();
 
-        // Act
         var prompt = @"<message role=""user"">博客园是什么网站</message>";
-        var result = await kernel.InvokePromptAsync(prompt);
+        PromptExecutionSettings settings = new()
+        {
+            ExtensionData = new Dictionary<string, object>()
+            {
+                { "temperature", "0.8" }
+            }
+        };
+        KernelArguments kernelArguments = new(settings);
+
+        // Act
+        var result = await kernel.InvokePromptAsync(prompt, kernelArguments);
 
         // Assert
         Assert.Contains("博客园", result.ToString());

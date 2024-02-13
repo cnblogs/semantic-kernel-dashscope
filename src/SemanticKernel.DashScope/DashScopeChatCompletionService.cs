@@ -27,17 +27,10 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService
 
     public async Task<IReadOnlyList<ChatMessageContent>> GetChatMessageContentsAsync(ChatHistory chatHistory, PromptExecutionSettings? executionSettings = null, Kernel? kernel = null, CancellationToken cancellationToken = default)
     {
-        var chatMessages = chatHistory
-            .Where(x => !string.IsNullOrEmpty(x.Content))
-            .Select(x => new ChatMessage(x.Role.ToString(), x.Content!)).
-            ToList();
-
-        var response = await _dashScopeClient.TextGeneration.Chat(
-            _modelId,
-            chatMessages,
-            cancellationToken: cancellationToken);
-
-        return [new ChatMessageContent(new AuthorRole(chatMessages.First().Role), response.Output.Text)];
+        var chatMessages = chatHistory.ToChatMessages();
+        var chatParameters = executionSettings?.ToChatParameters();
+        var response = await _dashScopeClient.TextGeneration.Chat(_modelId, chatMessages, chatParameters, cancellationToken);
+        return [new ChatMessageContent(new AuthorRole(chatMessages[0].Role), response.Output.Text)];
     }
 
     public async IAsyncEnumerable<StreamingChatMessageContent> GetStreamingChatMessageContentsAsync(
@@ -46,20 +39,15 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService
         Kernel? kernel = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var chatMessages = chatHistory
-            .Where(x => !string.IsNullOrEmpty(x.Content))
-            .Select(x => new ChatMessage(x.Role.ToString(), x.Content!)).
-            ToList();
+        var chatMessages = chatHistory.ToChatMessages();
+        var chatParameters = executionSettings?.ToChatParameters() ?? new ChatParameters();
+        chatParameters.IncrementalOutput = true;
 
-        var responses = _dashScopeClient.TextGeneration.ChatStreamed(
-            _modelId,
-            chatMessages,
-            new ChatParameters { IncrementalOutput = true },
-            cancellationToken: cancellationToken);
+        var responses = _dashScopeClient.TextGeneration.ChatStreamed(_modelId, chatMessages, chatParameters, cancellationToken);
 
         await foreach (var response in responses)
         {
-            yield return new StreamingChatMessageContent(new AuthorRole(chatMessages.First().Role), response.Output.Text);
+            yield return new StreamingChatMessageContent(new AuthorRole(chatMessages[0].Role), response.Output.Text);
         }
     }
 }
