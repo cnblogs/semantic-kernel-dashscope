@@ -1,5 +1,7 @@
 ﻿using Cnblogs.SemanticKernel.Connectors.DashScope;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace Microsoft.SemanticKernel;
@@ -27,5 +29,24 @@ public static class DashScopeServiceCollectionExtensions
         builder.Services.AddOptions<DashScopeClientOptions>().BindConfiguration(configSectionPath);
         builder.Services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
         return builder;
+    }
+
+    public static IKernelBuilder AddDashScopeChatCompletion<T>(
+        this IKernelBuilder builder,
+        string? serviceId = null,
+        Action<HttpClient>? configureClient = null,
+        string configSectionPath = "dashscope") where T : class
+    {
+        if (!builder.Services.Any(s => s.ServiceType == typeof(IConfiguration)))
+        {
+            IConfiguration config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddEnvironmentVariables()
+                .AddJsonFile("appsettings.json", true)
+                .AddUserSecrets<T>()
+                .Build();
+            builder.Services.TryAddSingleton(config);
+        }
+        return builder.AddDashScopeChatCompletion(serviceId, configureClient, configSectionPath);
     }
 }
