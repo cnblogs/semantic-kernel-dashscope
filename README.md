@@ -1,4 +1,4 @@
-# Cnblogs.SemanticKernel.Connectors.DashScope
+# SemanticKernel.Connectors.DashScope
 Semantic Kernel Connector to DashScope
 
 ## Get started
