@@ -49,4 +49,24 @@ public static class DashScopeServiceCollectionExtensions
         }
         return builder.AddDashScopeChatCompletion(serviceId, configureClient, configSectionPath);
     }
+
+    public static IKernelBuilder AddDashScopeChatCompletion(
+        this IKernelBuilder builder,
+        string modelId,
+        string apiKey,
+        string? serviceId = null,
+        Action<HttpClient>? configureClient = null)
+    {
+        Func<IServiceProvider, object?, DashScopeChatCompletionService> factory = (serviceProvider, _) =>
+        {
+            var options = new DashScopeClientOptions { ModelId = modelId, ApiKey = apiKey };
+            var httpClient = serviceProvider.GetRequiredService<HttpClient>();
+            configureClient?.Invoke(httpClient);
+            return new DashScopeChatCompletionService(options, httpClient);
+        };
+
+        builder.Services.AddHttpClient();
+        builder.Services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
+        return builder;
+    }
 }
