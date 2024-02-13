@@ -5,6 +5,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Cnblogs.SemanticKernel.Connectors.DashScope</RootNamespace>
+    <AssemblyName>Cnblogs.SemanticKernel.Connectors.DashScope</AssemblyName>
+    <Description>Semantic Kernel Connector to Aliyun DashScope.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>AI;SemanticKernel;DashScope;Qwen</PackageTags>
+    <RepositoryUrl>https://github.com/cnblogs/semantic-kernel-dashscope</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>    
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Authors>cnblogs.com</Authors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +22,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.3.0" />
     <PackageReference Include="Sdcb.DashScope" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
