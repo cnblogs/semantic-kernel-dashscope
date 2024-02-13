@@ -15,7 +15,7 @@ Add the `dashscope` section to the appsettings.json file.
   }
 }
 ```
-Add the api key into the user-secrets.
+Add the api key to the user-secrets.
 ```shell
 dotnet user-secrets init
 dotnet user-secrets set "dashscope:apiKey" "sk-xxx"
