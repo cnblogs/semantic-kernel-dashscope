@@ -9,14 +9,8 @@ public class DashScopeChatCompletionTests
     [Fact]
     public async Task ChatCompletion_InvokePromptAsync_WorksCorrectly()
     {
-        IConfiguration config = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
-            .AddUserSecrets<DashScopeChatCompletionTests>()
-            .Build();
-
         var builder = Kernel.CreateBuilder();
-        builder.Services.AddSingleton(config);
+        builder.Services.AddSingleton(GetConfiguration());
         builder.AddDashScopeChatCompletion();
         var kernel = builder.Build();
 
@@ -25,5 +19,14 @@ public class DashScopeChatCompletionTests
         Assert.Contains("博客园", result.ToString());
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.WriteLine(result);
+    }
+
+    private IConfiguration GetConfiguration()
+    {
+        return new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .AddUserSecrets<DashScopeChatCompletionTests>()
+            .Build();
     }
 }

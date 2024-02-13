@@ -6,7 +6,7 @@ using Microsoft.SemanticKernel.Services;
 using Sdcb.DashScope;
 using Sdcb.DashScope.TextGeneration;
 
-namespace Cnblogs.SemanticKernel.DashScope;
+namespace Cnblogs.SemanticKernel.Connectors.DashScope;
 
 public sealed class DashScopeChatCompletionService : IChatCompletionService
 {
@@ -55,6 +55,7 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService
         var responses = _dashScopeClient.TextGeneration.ChatStreamed(
             _modelId,
             chatMessages,
+            new ChatParameters { IncrementalOutput = true },
             cancellationToken: cancellationToken);
 
         await foreach (var response in responses)

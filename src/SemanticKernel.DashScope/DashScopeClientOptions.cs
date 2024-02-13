@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 
-namespace Cnblogs.SemanticKernel.DashScope;
+namespace Cnblogs.SemanticKernel.Connectors.DashScope;
 
 public class DashScopeClientOptions : IOptions<DashScopeClientOptions>
 {

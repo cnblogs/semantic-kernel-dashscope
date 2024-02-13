@@ -1,4 +1,4 @@
-﻿using Cnblogs.SemanticKernel.DashScope;
+﻿using Cnblogs.SemanticKernel.Connectors.DashScope;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel.ChatCompletion;
 
