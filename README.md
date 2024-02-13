@@ -23,27 +23,15 @@ dotnet user-secrets set "dashscope:apiKey" "sk-xxx"
 ## Usage
 Program.cs
 ```cs
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 
 var builder = Kernel.CreateBuilder();
-builder.Services.AddSingleton(GetConfiguration());
-builder.AddDashScopeChatCompletion();
+builder.AddDashScopeChatCompletion<Program>();
 var kernel = builder.Build();
 
 var prompt = @"<message role=""user"">Tell me about the Cnblogs</message>";
 var result = await kernel.InvokePromptAsync(prompt);
 Console.WriteLine(result);
-
-static IConfiguration GetConfiguration()
-{
-    return new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json")
-        .AddUserSecrets<Program>()
-        .Build();
-}
 
 public partial class Program
 { }
