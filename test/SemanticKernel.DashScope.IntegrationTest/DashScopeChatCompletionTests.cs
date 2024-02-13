@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.SemanticKernel;
 
 namespace SemanticKernel.DashScope.IntegrationTest;
@@ -13,8 +11,7 @@ public class DashScopeChatCompletionTests
     {
         // Arrange
         var builder = Kernel.CreateBuilder();
-        builder.Services.AddSingleton(GetConfiguration());
-        builder.AddDashScopeChatCompletion();
+        builder.AddDashScopeChatCompletion<DashScopeChatCompletionTests>();
         var kernel = builder.Build();
 
         var prompt = @"<message role=""user"">博客园是什么网站</message>";
@@ -40,8 +37,7 @@ public class DashScopeChatCompletionTests
     {
         // Arrange
         var builder = Kernel.CreateBuilder();
-        builder.Services.AddSingleton(GetConfiguration());
-        builder.AddDashScopeChatCompletion();
+        builder.AddDashScopeChatCompletion<DashScopeChatCompletionTests>();
         var kernel = builder.Build();
 
         // Act
@@ -52,18 +48,9 @@ public class DashScopeChatCompletionTests
         var sb = new StringBuilder();
         await foreach (var message in result)
         {
-            Trace.WriteLine(message);
+            Trace.Write(message);
             sb.Append(message);
         }
         Assert.Contains("博客园", sb.ToString());
-    }
-
-    private static IConfiguration GetConfiguration()
-    {
-        return new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
-            .AddUserSecrets<DashScopeChatCompletionTests>()
-            .Build();
     }
 }
