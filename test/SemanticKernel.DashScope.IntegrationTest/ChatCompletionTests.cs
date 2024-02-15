@@ -4,14 +4,14 @@ using Microsoft.SemanticKernel;
 
 namespace SemanticKernel.DashScope.IntegrationTest;
 
-public class DashScopeChatCompletionTests
+public class ChatCompletionTests
 {
     [Fact]
     public async Task ChatCompletion_InvokePromptAsync_WorksCorrectly()
     {
         // Arrange
         var builder = Kernel.CreateBuilder();
-        builder.AddDashScopeChatCompletion<DashScopeChatCompletionTests>();
+        builder.Services.AddDashScopeChatCompletion<ChatCompletionTests>();
         var kernel = builder.Build();
 
         var prompt = @"<message role=""user"">博客园是什么网站</message>";
@@ -37,7 +37,7 @@ public class DashScopeChatCompletionTests
     {
         // Arrange
         var builder = Kernel.CreateBuilder();
-        builder.AddDashScopeChatCompletion<DashScopeChatCompletionTests>();
+        builder.Services.AddDashScopeChatCompletion<ChatCompletionTests>();
         var kernel = builder.Build();
 
         // Act
