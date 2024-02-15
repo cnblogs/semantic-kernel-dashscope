@@ -11,43 +11,43 @@ public static class DashScopeServiceCollectionExtensions
     public static IKernelBuilder AddDashScopeChatCompletion(
         this IKernelBuilder builder,
         string? serviceId = null,
+        Action<DashScopeClientOptions>? configureOptions = null,
         Action<HttpClient>? configureClient = null,
         string configSectionPath = "dashscope")
     {
         Func<IServiceProvider, object?, DashScopeChatCompletionService> factory = (serviceProvider, _) =>
             serviceProvider.GetRequiredService<DashScopeChatCompletionService>();
 
-        if (configureClient == null)
-        {
-            builder.Services.AddHttpClient<DashScopeChatCompletionService>();
-        }
-        else
-        {
-            builder.Services.AddHttpClient<DashScopeChatCompletionService>(configureClient);
-        }
+        var optionsBuilder = builder.Services.AddOptions<DashScopeClientOptions>().BindConfiguration(configSectionPath);
+        if (configureOptions != null) optionsBuilder.PostConfigure(configureOptions);
 
-        builder.Services.AddOptions<DashScopeClientOptions>().BindConfiguration(configSectionPath);
+        var httpClientBuilder = configureClient == null
+            ? builder.Services.AddHttpClient<DashScopeChatCompletionService>()
+            : builder.Services.AddHttpClient<DashScopeChatCompletionService>(configureClient);
+
         builder.Services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
         return builder;
     }
 
     public static IKernelBuilder AddDashScopeChatCompletion<T>(
         this IKernelBuilder builder,
+        string? modelId = null,
+        string? apiKey = null,
         string? serviceId = null,
+        Action<DashScopeClientOptions>? configureOptions = null,
         Action<HttpClient>? configureClient = null,
         string configSectionPath = "dashscope") where T : class
     {
-        if (!builder.Services.Any(s => s.ServiceType == typeof(IConfiguration)))
+        builder.Services.AddConfiguration<T>();
+
+        void AggConfigureOptions(DashScopeClientOptions options)
         {
-            IConfiguration config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddEnvironmentVariables()
-                .AddJsonFile("appsettings.json", true)
-                .AddUserSecrets<T>()
-                .Build();
-            builder.Services.TryAddSingleton(config);
+            if (!string.IsNullOrEmpty(modelId)) options.ModelId = modelId;
+            if (!string.IsNullOrEmpty(apiKey)) options.ApiKey = apiKey;
+            configureOptions?.Invoke(options);
         }
-        return builder.AddDashScopeChatCompletion(serviceId, configureClient, configSectionPath);
+
+        return builder.AddDashScopeChatCompletion(serviceId, AggConfigureOptions, configureClient, configSectionPath);
     }
 
     public static IKernelBuilder AddDashScopeChatCompletion(
@@ -68,5 +68,21 @@ public static class DashScopeServiceCollectionExtensions
         builder.Services.AddHttpClient();
         builder.Services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
         return builder;
+    }
+
+    private static IServiceCollection AddConfiguration<T>(this IServiceCollection services) where T : class
+    {
+        if (!services.Any(s => s.ServiceType == typeof(IConfiguration)))
+        {
+            IConfiguration config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddEnvironmentVariables()
+                .AddJsonFile("appsettings.json", true)
+                .AddUserSecrets<T>()
+                .Build();
+            services.TryAddSingleton(config);
+        }
+
+        return services;
     }
 }
