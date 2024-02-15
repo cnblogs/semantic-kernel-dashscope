@@ -15,18 +15,29 @@ public static class DashScopeServiceCollectionExtensions
         Action<HttpClient>? configureClient = null,
         string configSectionPath = "dashscope")
     {
+        builder.Services.AddDashScopeChatCompletion(serviceId, configureOptions, configureClient, configSectionPath);
+        return builder;
+    }
+
+    public static IServiceCollection AddDashScopeChatCompletion(
+        this IServiceCollection services,
+        string? serviceId = null,
+        Action<DashScopeClientOptions>? configureOptions = null,
+        Action<HttpClient>? configureClient = null,
+        string configSectionPath = "dashscope")
+    {
         Func<IServiceProvider, object?, DashScopeChatCompletionService> factory = (serviceProvider, _) =>
             serviceProvider.GetRequiredService<DashScopeChatCompletionService>();
 
-        var optionsBuilder = builder.Services.AddOptions<DashScopeClientOptions>().BindConfiguration(configSectionPath);
+        var optionsBuilder = services.AddOptions<DashScopeClientOptions>().BindConfiguration(configSectionPath);
         if (configureOptions != null) optionsBuilder.PostConfigure(configureOptions);
 
         var httpClientBuilder = configureClient == null
-            ? builder.Services.AddHttpClient<DashScopeChatCompletionService>()
-            : builder.Services.AddHttpClient<DashScopeChatCompletionService>(configureClient);
+            ? services.AddHttpClient<DashScopeChatCompletionService>()
+            : services.AddHttpClient<DashScopeChatCompletionService>(configureClient);
 
-        builder.Services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
-        return builder;
+        services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
+        return services;
     }
 
     public static IKernelBuilder AddDashScopeChatCompletion<T>(
@@ -38,7 +49,20 @@ public static class DashScopeServiceCollectionExtensions
         Action<HttpClient>? configureClient = null,
         string configSectionPath = "dashscope") where T : class
     {
-        builder.Services.AddConfiguration<T>();
+        builder.Services.AddDashScopeChatCompletion<T>(modelId, apiKey, serviceId, configureOptions, configureClient);
+        return builder;
+    }
+
+    public static IServiceCollection AddDashScopeChatCompletion<T>(
+        this IServiceCollection services,
+        string? modelId = null,
+        string? apiKey = null,
+        string? serviceId = null,
+        Action<DashScopeClientOptions>? configureOptions = null,
+        Action<HttpClient>? configureClient = null,
+        string configSectionPath = "dashscope") where T : class
+    {
+        services.AddConfiguration<T>();
 
         void AggConfigureOptions(DashScopeClientOptions options)
         {
@@ -47,11 +71,22 @@ public static class DashScopeServiceCollectionExtensions
             configureOptions?.Invoke(options);
         }
 
-        return builder.AddDashScopeChatCompletion(serviceId, AggConfigureOptions, configureClient, configSectionPath);
+        return services.AddDashScopeChatCompletion(serviceId, AggConfigureOptions, configureClient, configSectionPath);
     }
 
     public static IKernelBuilder AddDashScopeChatCompletion(
         this IKernelBuilder builder,
+        string modelId,
+        string apiKey,
+        string? serviceId = null,
+        Action<HttpClient>? configureClient = null)
+    {
+        builder.Services.AddDashScopeChatCompletion(modelId, apiKey, serviceId, configureClient);
+        return builder;
+    }
+
+    public static IServiceCollection AddDashScopeChatCompletion(
+        this IServiceCollection services,
         string modelId,
         string apiKey,
         string? serviceId = null,
@@ -65,9 +100,9 @@ public static class DashScopeServiceCollectionExtensions
             return new DashScopeChatCompletionService(options, httpClient);
         };
 
-        builder.Services.AddHttpClient();
-        builder.Services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
-        return builder;
+        services.AddHttpClient();
+        services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
+        return services;
     }
 
     private static IServiceCollection AddConfiguration<T>(this IServiceCollection services) where T : class
