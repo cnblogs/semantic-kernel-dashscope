@@ -30,7 +30,11 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService
         var chatMessages = chatHistory.ToChatMessages();
         var chatParameters = executionSettings?.ToChatParameters();
         var response = await _dashScopeClient.TextGeneration.Chat(_modelId, chatMessages, chatParameters, cancellationToken);
-        return [new ChatMessageContent(new AuthorRole(chatMessages[0].Role), response.Output.Text)];
+        var chatMessageContent = new ChatMessageContent(
+            new AuthorRole(chatMessages[0].Role),
+            response.Output.Text,
+            metadata: response.Usage.ToMetadata());
+        return [chatMessageContent];
     }
 
     public async IAsyncEnumerable<StreamingChatMessageContent> GetStreamingChatMessageContentsAsync(
@@ -44,10 +48,12 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService
         chatParameters.IncrementalOutput = true;
 
         var responses = _dashScopeClient.TextGeneration.ChatStreamed(_modelId, chatMessages, chatParameters, cancellationToken);
-
         await foreach (var response in responses)
         {
-            yield return new StreamingChatMessageContent(new AuthorRole(chatMessages[0].Role), response.Output.Text);
+            yield return new StreamingChatMessageContent(
+                new AuthorRole(chatMessages[0].Role),
+                response.Output.Text,
+                metadata: response.Usage.ToMetadata());
         }
     }
 }
