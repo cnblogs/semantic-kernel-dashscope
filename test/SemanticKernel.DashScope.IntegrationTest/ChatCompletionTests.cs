@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using Microsoft.SemanticKernel;
+using Sdcb.DashScope.TextGeneration;
 
 namespace SemanticKernel.DashScope.IntegrationTest;
 
@@ -29,6 +30,7 @@ public class ChatCompletionTests
 
         // Assert
         Assert.Contains("博客园", result.ToString());
+        Assert.Equal(4, GetUsage(result.Metadata)?.InputTokens);
         Trace.WriteLine(result.ToString());
     }
 
@@ -46,11 +48,21 @@ public class ChatCompletionTests
 
         // Assert
         var sb = new StringBuilder();
-        await foreach (var message in result)
+        await foreach (var content in result)
         {
-            Trace.Write(message);
-            sb.Append(message);
+            Trace.Write(content);
+            sb.Append(content);
+            Assert.Equal(4, GetUsage(content.Metadata)?.InputTokens);
         }
         Assert.Contains("博客园", sb.ToString());
+
+    }
+
+    private static ChatTokenUsage? GetUsage(IReadOnlyDictionary<string, object?>? metadata)
+    {
+        return metadata?.TryGetValue("Usage", out var value) == true &&
+            value is ChatTokenUsage usage
+            ? usage
+            : null;
     }
 }
