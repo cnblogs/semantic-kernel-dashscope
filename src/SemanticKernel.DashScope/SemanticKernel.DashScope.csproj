@@ -10,22 +10,21 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>AI;SemanticKernel;DashScope;Qwen</PackageTags>
     <RepositoryUrl>https://github.com/cnblogs/semantic-kernel-dashscope</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>    
+    <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>cnblogs.com</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>SKEXP0001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App"></FrameworkReference>
+    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    <PackageReference Include="Cnblogs.DashScope.Sdk" Version="0.0.3"/>
+    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.4.0" />
-    <PackageReference Include="Sdcb.DashScope" Version="1.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="../../README.md" Pack="true" PackagePath="\" />
+    <None Include="../../README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
 </Project>

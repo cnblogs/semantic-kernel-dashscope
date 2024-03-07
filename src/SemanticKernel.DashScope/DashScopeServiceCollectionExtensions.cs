@@ -1,123 +1,108 @@
-﻿using Cnblogs.SemanticKernel.Connectors.DashScope;
+﻿using Cnblogs.DashScope.Sdk;
+using Cnblogs.SemanticKernel.Connectors.DashScope;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Embeddings;
+using Microsoft.SemanticKernel.TextGeneration;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.SemanticKernel;
 
+/// <summary>
+/// Extensions for DI.
+/// </summary>
 public static class DashScopeServiceCollectionExtensions
 {
-    public static IKernelBuilder AddDashScopeChatCompletion(
-        this IKernelBuilder builder,
-        string? serviceId = null,
-        Action<DashScopeClientOptions>? configureOptions = null,
-        Action<HttpClient>? configureClient = null,
-        string configSectionPath = "dashscope")
+    #region TextEmbedding
+
+    /// <summary>
+    /// Adds a DashScope text embedding generation service
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    /// <param name="configuration">The configuration root.</param>
+    /// <param name="serviceId">The local identifier of service.</param>
+    /// <param name="sectionName">The section name in configuration.</param>
+    /// <returns></returns>
+    public static IServiceCollection AddDashScopeTextEmbeddingGeneration(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        string sectionName = "dashScope",
+        string? serviceId = null)
     {
-        builder.Services.AddDashScopeChatCompletion(serviceId, configureOptions, configureClient, configSectionPath);
-        return builder;
+        var option = configuration.GetOptions(sectionName);
+        return services.AddDashScopeTextEmbeddingGeneration(option.ApiKey, option.TextEmbeddingModelId, serviceId);
     }
 
+    /// <summary>
+    /// Adds a DashScope text embedding generation service.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    /// <param name="apiKey">The api key of DashScope.</param>
+    /// <param name="modelId">The model id.</param>
+    /// <param name="serviceId">A local identifier for the given AI service.</param>
+    /// <returns></returns>
+    public static IServiceCollection AddDashScopeTextEmbeddingGeneration(
+        this IServiceCollection services,
+        string apiKey,
+        string modelId,
+        string? serviceId = null)
+    {
+        return services.AddKeyedSingleton<ITextEmbeddingGenerationService, DashScopeTextEmbeddingGenerationService>(
+            serviceId,
+            (_, _) => new DashScopeTextEmbeddingGenerationService(modelId, new DashScopeClient(apiKey)));
+    }
+
+    #endregion
+
+    #region ChatCompletion
+
+    /// <summary>
+    /// Add DashScope as chat completion service and fetch <see cref="DashScopeOptions"/> from <see cref="IConfiguration"/>.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/>.</param>
+    /// <param name="configuration">The configuration root.</param>
+    /// <param name="serviceId">The local identifier of service.</param>
+    /// <param name="sectionName">The section name in configuration.</param>
+    /// <returns></returns>
     public static IServiceCollection AddDashScopeChatCompletion(
         this IServiceCollection services,
+        IConfiguration configuration,
         string? serviceId = null,
-        Action<DashScopeClientOptions>? configureOptions = null,
-        Action<HttpClient>? configureClient = null,
-        string configSectionPath = "dashscope")
+        string sectionName = "dashScope")
     {
-        Func<IServiceProvider, object?, DashScopeChatCompletionService> factory = (serviceProvider, _) =>
-            serviceProvider.GetRequiredService<DashScopeChatCompletionService>();
-
-        var optionsBuilder = services.AddOptions<DashScopeClientOptions>().BindConfiguration(configSectionPath);
-        if (configureOptions != null) optionsBuilder.PostConfigure(configureOptions);
-
-        var httpClientBuilder = configureClient == null
-            ? services.AddHttpClient<DashScopeChatCompletionService>()
-            : services.AddHttpClient<DashScopeChatCompletionService>(configureClient);
-
-        services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
-        return services;
+        var option = configuration.GetOptions(sectionName);
+        return services.AddDashScopeChatCompletion(option.ApiKey, option.ChatCompletionModelId, serviceId);
     }
 
-    public static IKernelBuilder AddDashScopeChatCompletion<T>(
-        this IKernelBuilder builder,
-        string? modelId = null,
-        string? apiKey = null,
-        string? serviceId = null,
-        Action<DashScopeClientOptions>? configureOptions = null,
-        Action<HttpClient>? configureClient = null,
-        string configSectionPath = "dashscope") where T : class
-    {
-        builder.Services.AddDashScopeChatCompletion<T>(modelId, apiKey, serviceId, configureOptions, configureClient);
-        return builder;
-    }
-
-    public static IServiceCollection AddDashScopeChatCompletion<T>(
-        this IServiceCollection services,
-        string? modelId = null,
-        string? apiKey = null,
-        string? serviceId = null,
-        Action<DashScopeClientOptions>? configureOptions = null,
-        Action<HttpClient>? configureClient = null,
-        string configSectionPath = "dashscope") where T : class
-    {
-        services.AddConfiguration<T>();
-
-        void AggConfigureOptions(DashScopeClientOptions options)
-        {
-            if (!string.IsNullOrEmpty(modelId)) options.ModelId = modelId;
-            if (!string.IsNullOrEmpty(apiKey)) options.ApiKey = apiKey;
-            configureOptions?.Invoke(options);
-        }
-
-        return services.AddDashScopeChatCompletion(serviceId, AggConfigureOptions, configureClient, configSectionPath);
-    }
-
-    public static IKernelBuilder AddDashScopeChatCompletion(
-        this IKernelBuilder builder,
-        string modelId,
-        string apiKey,
-        string? serviceId = null,
-        Action<HttpClient>? configureClient = null)
-    {
-        builder.Services.AddDashScopeChatCompletion(modelId, apiKey, serviceId, configureClient);
-        return builder;
-    }
-
+    /// <summary>
+    /// Add DashScope as chat completion service.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/></param>
+    /// <param name="apiKey">The api key for DashScope.</param>
+    /// <param name="modelId">The model name.</param>
+    /// <param name="serviceId">The local identifier of service.</param>
+    /// <returns></returns>
     public static IServiceCollection AddDashScopeChatCompletion(
         this IServiceCollection services,
-        string modelId,
         string apiKey,
-        string? serviceId = null,
-        Action<HttpClient>? configureClient = null)
+        string modelId,
+        string? serviceId = null)
     {
-        Func<IServiceProvider, object?, DashScopeChatCompletionService> factory = (serviceProvider, _) =>
-        {
-            var options = new DashScopeClientOptions { ModelId = modelId, ApiKey = apiKey };
-            var httpClient = serviceProvider.GetRequiredService<HttpClient>();
-            configureClient?.Invoke(httpClient);
-            return new DashScopeChatCompletionService(options, httpClient);
-        };
-
-        services.AddHttpClient();
-        services.AddKeyedSingleton<IChatCompletionService>(serviceId, factory);
-        return services;
+        services.AddKeyedSingleton<ITextGenerationService, DashScopeChatCompletionService>(
+            serviceId,
+            (_, _) => new DashScopeChatCompletionService(modelId, new DashScopeClient(apiKey)));
+        return services.AddKeyedSingleton<IChatCompletionService, DashScopeChatCompletionService>(
+            serviceId,
+            (_, _) => new DashScopeChatCompletionService(modelId, new DashScopeClient(apiKey)));
     }
 
-    private static IServiceCollection AddConfiguration<T>(this IServiceCollection services) where T : class
-    {
-        if (!services.Any(s => s.ServiceType == typeof(IConfiguration)))
-        {
-            IConfiguration config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddEnvironmentVariables()
-                .AddJsonFile("appsettings.json", true)
-                .AddUserSecrets<T>()
-                .Build();
-            services.TryAddSingleton(config);
-        }
+    #endregion
 
-        return services;
+    private static DashScopeOptions GetOptions(this IConfiguration configuration, string sectionName)
+    {
+        return configuration.GetSection(sectionName).Get<DashScopeOptions>()
+               ?? throw new InvalidOperationException(
+                   $"Can not resolve {nameof(DashScopeOptions)} from section: {sectionName}");
     }
 }

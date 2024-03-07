@@ -3,37 +3,51 @@ Semantic Kernel Connector to DashScope
 
 ## Get started
 Add the NuGet package to your project.
-```shell 
+```shell
 dotnet add package Cnblogs.SemanticKernel.Connectors.DashScope
 ```
 
-Add the `dashscope` section to the appsettings.json file.
-```json
-{
-  "dashscope": {
-    "modelId": "qwen-max"
-  }
-}
-```
-Add the api key to the user-secrets.
-```shell
-dotnet user-secrets init
-dotnet user-secrets set "dashscope:apiKey" "sk-xxx"
-```
-## Usage
-Program.cs
 ```cs
 using Microsoft.SemanticKernel;
 
 var builder = Kernel.CreateBuilder();
-builder.AddDashScopeChatCompletion<Program>();
+builder.Service.AddDashScopeChatCompletion("your-api-key", "qwen-max");
 var kernel = builder.Build();
 
 var prompt = @"<message role=""user"">Tell me about the Cnblogs</message>";
 var result = await kernel.InvokePromptAsync(prompt);
 Console.WriteLine(result);
-
-public partial class Program
-{ }
 ```
 
+## ASP.NET Core
+
+`appsettings.json`
+
+```json
+{
+    "dashScope": {
+        "apiKey": "your-key",
+        "chatCompletionModelId": "qwen-max",
+        "textEmbeddingModelId": "text-embedding-v2"
+    }
+}
+```
+
+`Program.cs`
+```csharp
+builder.AddTransient<Kernel>(sp => new Kernel(sp));
+```
+
+Services
+
+```csharp
+public class YourService(Kernel kernel)
+{
+    public async Task<string> GetCompletionAsync(string prompt)
+    {
+        var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+        var chatResult = await chatCompletionService.GetChatMessageContentAsync(prompt, null, _kernel);
+        return chatResult.ToString();
+    }
+}
+```

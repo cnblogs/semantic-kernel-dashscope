@@ -1,42 +1,62 @@
 ﻿using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Options;
+using Cnblogs.DashScope.Sdk;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Services;
-using Sdcb.DashScope;
-using Sdcb.DashScope.TextGeneration;
+using Microsoft.SemanticKernel.TextGeneration;
 
 namespace Cnblogs.SemanticKernel.Connectors.DashScope;
 
-public sealed class DashScopeChatCompletionService : IChatCompletionService
+/// <summary>
+/// DashScope chat completion service.
+/// </summary>
+public sealed class DashScopeChatCompletionService : IChatCompletionService, ITextGenerationService
 {
-    private readonly DashScopeClient _dashScopeClient;
+    private readonly IDashScopeClient _dashScopeClient;
+    private readonly Dictionary<string, object?> _attributes = new();
     private readonly string _modelId;
-    private readonly Dictionary<string, object?> _attribues = [];
 
-    public DashScopeChatCompletionService(
-        IOptions<DashScopeClientOptions> options,
-        HttpClient httpClient)
+    /// <summary>
+    /// Creates a new DashScope chat completion service.
+    /// </summary>
+    /// <param name="modelId"></param>
+    /// <param name="dashScopeClient"></param>
+    public DashScopeChatCompletionService(string modelId, IDashScopeClient dashScopeClient)
     {
-        _dashScopeClient = new(options.Value.ApiKey, httpClient);
-        _modelId = options.Value.ModelId;
-        _attribues.Add(AIServiceExtensions.ModelIdKey, _modelId);
+        _dashScopeClient = dashScopeClient;
+        _modelId = modelId;
+        _attributes.Add(AIServiceExtensions.ModelIdKey, _modelId);
     }
 
-    public IReadOnlyDictionary<string, object?> Attributes => _attribues;
-
-    public async Task<IReadOnlyList<ChatMessageContent>> GetChatMessageContentsAsync(ChatHistory chatHistory, PromptExecutionSettings? executionSettings = null, Kernel? kernel = null, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ChatMessageContent>> GetChatMessageContentsAsync(
+        ChatHistory chatHistory,
+        PromptExecutionSettings? executionSettings = null,
+        Kernel? kernel = null,
+        CancellationToken cancellationToken = default)
     {
         var chatMessages = chatHistory.ToChatMessages();
-        var chatParameters = executionSettings?.ToChatParameters();
-        var response = await _dashScopeClient.TextGeneration.Chat(_modelId, chatMessages, chatParameters, cancellationToken);
+        var chatParameters = DashScopePromptExecutionSettings.FromPromptExecutionSettings(executionSettings);
+        chatParameters ??= new DashScopePromptExecutionSettings();
+        chatParameters.IncrementalOutput = false;
+        chatParameters.ResultFormat = ResultFormats.Message;
+        var response = await _dashScopeClient.GetTextCompletionAsync(
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+            {
+                Input = new TextGenerationInput { Messages = chatMessages },
+                Model = string.IsNullOrEmpty(chatParameters.ModelId) ? _modelId : chatParameters.ModelId,
+                Parameters = chatParameters
+            },
+            cancellationToken);
+        var message = response.Output.Choices![0].Message;
         var chatMessageContent = new ChatMessageContent(
-            new AuthorRole(chatMessages[0].Role),
-            response.Output.Text,
-            metadata: response.Usage.ToMetadata());
+            new AuthorRole(message.Role),
+            message.Content,
+            metadata: response.ToMetaData());
         return [chatMessageContent];
     }
 
+    /// <inheritdoc />
     public async IAsyncEnumerable<StreamingChatMessageContent> GetStreamingChatMessageContentsAsync(
         ChatHistory chatHistory,
         PromptExecutionSettings? executionSettings = null,
@@ -44,16 +64,81 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var chatMessages = chatHistory.ToChatMessages();
-        var chatParameters = executionSettings?.ToChatParameters() ?? new ChatParameters();
-        chatParameters.IncrementalOutput = true;
+        executionSettings ??= new DashScopePromptExecutionSettings();
+        var parameters = DashScopePromptExecutionSettings.FromPromptExecutionSettings(executionSettings);
+        parameters.IncrementalOutput = true;
+        parameters.ResultFormat = ResultFormats.Message;
+        var responses = _dashScopeClient.GetTextCompletionStreamAsync(
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+            {
+                Input = new TextGenerationInput { Messages = chatMessages },
+                Model = string.IsNullOrEmpty(parameters.ModelId) ? _modelId : parameters.ModelId,
+                Parameters = parameters
+            },
+            cancellationToken);
 
-        var responses = _dashScopeClient.TextGeneration.ChatStreamed(_modelId, chatMessages, chatParameters, cancellationToken);
         await foreach (var response in responses)
         {
+            var message = response.Output.Choices![0].Message;
             yield return new StreamingChatMessageContent(
-                new AuthorRole(chatMessages[0].Role),
+                new AuthorRole(message.Role),
+                message.Content,
+                modelId: _modelId,
+                metadata: response.ToMetaData());
+        }
+    }
+
+    /// <inheritdoc />
+    public IReadOnlyDictionary<string, object?> Attributes => _attributes;
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<TextContent>> GetTextContentsAsync(
+        string prompt,
+        PromptExecutionSettings? executionSettings = null,
+        Kernel? kernel = null,
+        CancellationToken cancellationToken = new())
+    {
+        var chatParameters = DashScopePromptExecutionSettings.FromPromptExecutionSettings(executionSettings);
+        chatParameters ??= new DashScopePromptExecutionSettings();
+        chatParameters.IncrementalOutput = false;
+        chatParameters.ResultFormat = ResultFormats.Text;
+        var response = await _dashScopeClient.GetTextCompletionAsync(
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+            {
+                Input = new TextGenerationInput { Prompt = prompt },
+                Model = string.IsNullOrEmpty(chatParameters.ModelId) ? _modelId : chatParameters.ModelId,
+                Parameters = chatParameters
+            },
+            cancellationToken);
+        return [new TextContent(response.Output.Text, _modelId, metadata: response.ToMetaData())];
+    }
+
+    /// <inheritdoc />
+    public async IAsyncEnumerable<StreamingTextContent> GetStreamingTextContentsAsync(
+        string prompt,
+        PromptExecutionSettings? executionSettings = null,
+        Kernel? kernel = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = new())
+    {
+        executionSettings ??= new DashScopePromptExecutionSettings();
+        var parameters = DashScopePromptExecutionSettings.FromPromptExecutionSettings(executionSettings);
+        parameters.IncrementalOutput = true;
+        parameters.ResultFormat = ResultFormats.Text;
+        var responses = _dashScopeClient.GetTextCompletionStreamAsync(
+            new ModelRequest<TextGenerationInput, ITextGenerationParameters>
+            {
+                Input = new TextGenerationInput { Prompt = prompt },
+                Model = string.IsNullOrEmpty(parameters.ModelId) ? _modelId : parameters.ModelId,
+                Parameters = parameters
+            },
+            cancellationToken);
+
+        await foreach (var response in responses)
+        {
+            yield return new StreamingTextContent(
                 response.Output.Text,
-                metadata: response.Usage.ToMetadata());
+                modelId: _modelId,
+                metadata: response.ToMetaData());
         }
     }
 }
