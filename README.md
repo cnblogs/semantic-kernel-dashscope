@@ -11,12 +11,12 @@ dotnet add package Cnblogs.SemanticKernel.Connectors.DashScope
 using Microsoft.SemanticKernel;
 
 var builder = Kernel.CreateBuilder();
-builder.Service.AddDashScopeChatCompletion("your-api-key", "qwen-max");
+builder.Services.AddDashScopeChatCompletion("your-api-key", "qwen-max");
 var kernel = builder.Build();
 
-var prompt = @"<message role=""user"">Tell me about the Cnblogs</message>";
-var result = await kernel.InvokePromptAsync(prompt);
-Console.WriteLine(result);
+var prompt = "<message role=\"user\">Tell me about the Cnblogs</message>";
+var response = await kernel.InvokePromptAsync(prompt);
+Console.WriteLine(response);
 ```
 
 ## ASP.NET Core
@@ -35,7 +35,8 @@ Console.WriteLine(result);
 
 `Program.cs`
 ```csharp
-builder.AddTransient<Kernel>(sp => new Kernel(sp));
+builder.Services.AddDashScopeChatCompletion(builder.Configuration);
+builder.Services.AddScoped<Kernel>(sp => new Kernel(sp));
 ```
 
 Services
@@ -45,8 +46,7 @@ public class YourService(Kernel kernel)
 {
     public async Task<string> GetCompletionAsync(string prompt)
     {
-        var chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
-        var chatResult = await chatCompletionService.GetChatMessageContentAsync(prompt, null, _kernel);
+        var chatResult = await kernel.InvokePromptAsync(prompt);
         return chatResult.ToString();
     }
 }
