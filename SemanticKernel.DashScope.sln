@@ -16,6 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{DAB267DF-F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticKernel.DashScope.UnitTest", "test\SemanticKernel.DashScope.UnitTest\SemanticKernel.DashScope.UnitTest.csproj", "{648EBC1D-9409-4205-905E-DD06E4443AAA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KernelMemory.DashScope", "src\KernelMemory.DashScope\KernelMemory.DashScope.csproj", "{B68EBD2E-8169-4546-95CC-92D6F097C039}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KernelMemory.DashScope.UnitTests", "test\KernelMemory.DashScope.UnitTests\KernelMemory.DashScope.UnitTests.csproj", "{A69BEA7D-6B14-4185-9696-94814F76A2DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +34,14 @@ Global
 		{648EBC1D-9409-4205-905E-DD06E4443AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{648EBC1D-9409-4205-905E-DD06E4443AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{648EBC1D-9409-4205-905E-DD06E4443AAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B68EBD2E-8169-4546-95CC-92D6F097C039}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B68EBD2E-8169-4546-95CC-92D6F097C039}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B68EBD2E-8169-4546-95CC-92D6F097C039}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B68EBD2E-8169-4546-95CC-92D6F097C039}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A69BEA7D-6B14-4185-9696-94814F76A2DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A69BEA7D-6B14-4185-9696-94814F76A2DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A69BEA7D-6B14-4185-9696-94814F76A2DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A69BEA7D-6B14-4185-9696-94814F76A2DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +49,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{B9EF31C7-48D7-4CA8-8D15-D6340450D3F5} = {BB73FA18-BBBE-4C34-971A-D4206FC118A2}
 		{648EBC1D-9409-4205-905E-DD06E4443AAA} = {DAB267DF-F966-4F95-AD12-56CC78D6F274}
+		{B68EBD2E-8169-4546-95CC-92D6F097C039} = {BB73FA18-BBBE-4C34-971A-D4206FC118A2}
+		{A69BEA7D-6B14-4185-9696-94814F76A2DA} = {DAB267DF-F966-4F95-AD12-56CC78D6F274}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D0F2E9A4-9782-4C3F-B459-CFCAD4C9AD9F}
