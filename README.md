@@ -1,6 +1,6 @@
 # SemanticKernel.DashScope
 
-Make DashScope work with Semantic Kernel and KernelMemory.
+Make DashScope work with Semantic Kernel and Kernel Memory.
 
 ## Get started with SemanticKernel
 Add the NuGet package to your project.
