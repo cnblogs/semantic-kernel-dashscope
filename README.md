@@ -1,7 +1,8 @@
-# SemanticKernel.Connectors.DashScope
-Semantic Kernel Connector to DashScope
+# SemanticKernel.DashScope
 
-## Get started
+Make DashScope work with Semantic Kernel and KernelMemory.
+
+## Get started with SemanticKernel
 Add the NuGet package to your project.
 ```shell
 dotnet add package Cnblogs.SemanticKernel.Connectors.DashScope
