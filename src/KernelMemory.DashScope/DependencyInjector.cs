@@ -1,5 +1,6 @@
 ﻿using Cnblogs.DashScope.Sdk;
 using Cnblogs.KernelMemory.AI.DashScope;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.KernelMemory.AI;
@@ -51,6 +52,29 @@ public static class DependencyInjector
         var client = new DashScopeClient(config.ApiKey);
         builder.WithDashScope(config, textEmbeddingTokenizer, textGenerationTokenizer, onlyForRetrieval, client);
         return builder;
+    }
+
+    /// <summary>
+    /// Use DashScope models for ingestion and retrieval.
+    /// </summary>
+    /// <param name="builder">The <see cref="IKernelMemoryBuilder"/>.</param>
+    /// <param name="configuration">Configuration root.</param>
+    /// <param name="sectionName">Section name to bind <see cref="DashScopeConfig"/> from.</param>
+    /// <param name="embeddingTokenizer">Tokenizer used to count tokens used by embedding generator.</param>
+    /// <param name="textTokenizer">Tokenizer used to count tokens used by prompts</param>
+    /// <param name="onlyForRetrieval">Whether to use DashScope only for ingestion, not for retrieval (search and ask API)</param>
+    /// <param name="dashScopeClient">The underlying <see cref="IDashScopeClient"/>.</param>
+    public static IKernelMemoryBuilder WithDashScope(
+        this IKernelMemoryBuilder builder,
+        IConfiguration configuration,
+        string sectionName = "dashScope",
+        ITextTokenizer? embeddingTokenizer = null,
+        ITextTokenizer? textTokenizer = null,
+        bool onlyForRetrieval = false,
+        IDashScopeClient? dashScopeClient = null)
+    {
+        var config = configuration.GetConfig(sectionName);
+        return builder.WithDashScope(config, embeddingTokenizer, textTokenizer, onlyForRetrieval, dashScopeClient);
     }
 
     /// <summary>
@@ -183,5 +207,12 @@ public static class DependencyInjector
                 sp.GetService<ILoggerFactory>(),
                 tokenizer,
                 config.TextModelMaxTokenTotal));
+    }
+
+    private static DashScopeConfig GetConfig(this IConfiguration configuration, string sectionName)
+    {
+        return configuration.GetSection(sectionName).Get<DashScopeConfig>()
+               ?? throw new InvalidOperationException(
+                   $"Can not resolve {nameof(DashScopeConfig)} from section: {sectionName}");
     }
 }

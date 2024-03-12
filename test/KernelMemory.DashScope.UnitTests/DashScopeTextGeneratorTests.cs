@@ -35,6 +35,31 @@ public class DashScopeTextGeneratorTests
     }
 
     [Fact]
+    public async Task TextGenerator_DefaultsToZero_MapZeroToNullAsync()
+    {
+        // Arrange
+        var list = new[] { Cases.TextGenerationResponse };
+        var client = Substitute.For<IDashScopeClient>();
+        ModelRequest<TextGenerationInput, ITextGenerationParameters>? captured = null;
+        client.Configure()
+            .GetTextCompletionStreamAsync(
+                Arg.Do<ModelRequest<TextGenerationInput, ITextGenerationParameters>>(x => captured = x))
+            .Returns(list.ToAsyncEnumerable());
+        var generator = new DashScopeTextGenerator(client, Cases.ModelId, new NullLoggerFactory());
+
+        // Act
+        var response = await generator.GenerateTextAsync(Cases.Text, Cases.TextGenerationOptions).ToListAsync();
+
+        // Assert
+        response[0].Should().BeSameAs(
+            Cases.TextGenerationResponse.Output.Text,
+            "generated text should mapped from output.text");
+        captured.Should().BeEquivalentTo(
+            new { Parameters = Cases.TextGenerationParameters },
+            "text options should be mapped to text generation parameters correctly");
+    }
+
+    [Fact]
     public void TextGenerator_NullTokenizer_UseQWenTokenizer()
     {
         // Arrange

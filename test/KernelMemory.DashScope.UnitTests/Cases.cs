@@ -12,7 +12,6 @@ public static class Cases
 
     public static readonly TextGenerationOptions TextGenerationOptions = new()
     {
-        Temperature = 0.85,
         TopP = 0.8,
         FrequencyPenalty = 0.1,
         MaxTokens = 1000,
@@ -24,7 +23,6 @@ public static class Cases
 
     public static readonly TextGenerationParameters TextGenerationParameters = new()
     {
-        Temperature = 0.85f,
         TopP = 0.8f,
         RepetitionPenalty = 1.1f,
         MaxTokens = 1000,
@@ -91,5 +89,12 @@ public static class Cases
         EmbeddingModelMaxTokenTotal = 1000,
         ChatCompletionModelId = "qwen-max",
         TextModelMaxTokenTotal = 1000
+    };
+
+    public static readonly Dictionary<string, string?> Configurations = new()
+    {
+        { "dashScope:apiKey", "apiKey" },
+        { "dashScope:chatCompletionModelId", "qwen-max" },
+        { "dashScope:textEmbeddingModelId", "text-embedding-v2" }
     };
 }

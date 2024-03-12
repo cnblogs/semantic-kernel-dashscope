@@ -19,7 +19,13 @@ var response = await kernel.InvokePromptAsync(prompt);
 Console.WriteLine(response);
 ```
 
-## ASP.NET Core
+## ASP.NET Core with KernelMemory support
+
+Install Nuget package `Cnblogs.KernelMemory.AI.DashScope`
+
+Install Nuget package `Microsoft.KernelMemory.Core`
+
+Install Nuget package `Microsoft.KernelMemory.SemanticKernelPlugin`
 
 `appsettings.json`
 
@@ -35,19 +41,54 @@ Console.WriteLine(response);
 
 `Program.cs`
 ```csharp
+// Kernel Memory stuff
+var memory = new KernelMemoryBuilder(builder.Services).WithDashScope(builder.Configuration).Build();
+builder.Services.AddSingleton(memory);
+
+// SK stuff
 builder.Services.AddDashScopeChatCompletion(builder.Configuration);
-builder.Services.AddScoped<Kernel>(sp => new Kernel(sp));
+builder.Services.AddSingleton(
+    sp =>
+    {
+        var plugins = new KernelPluginCollection();
+        plugins.AddFromObject(
+            new MemoryPlugin(sp.GetRequiredService<IKernelMemory>(), waitForIngestionToComplete: true),
+            "memory");
+        return new Kernel(sp, plugins);
+    });
 ```
 
 Services
 
 ```csharp
-public class YourService(Kernel kernel)
+public class YourService(Kernel kernel, IKernelMemory memory)
 {
     public async Task<string> GetCompletionAsync(string prompt)
     {
         var chatResult = await kernel.InvokePromptAsync(prompt);
         return chatResult.ToString();
+    }
+
+    public async Task ImportDocumentAsync(string filePath, string documentId)
+    {
+        await memory.ImportDocumentAsync(filePath, documentId);
+    }
+
+    public async Task<string> AskMemoryAsync(string question)
+    {
+        // use memory.ask to query kernel memory
+        var skPrompt = """
+                       Question to Kernel Memory: {{$input}}
+
+                       Kernel Memory Answer: {{memory.ask $input}}
+
+                       If the answer is empty say 'I don't know' otherwise reply with a preview of the answer, truncated to 15 words.
+                       """;
+
+        // you can bundle created functions into a singleton service to reuse them
+        var myFunction = kernel.CreateFunctionFromPrompt(skPrompt);
+        var result = await myFunction.InvokeAsync(question);
+        return result.ToString();
     }
 }
 ```

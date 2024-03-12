@@ -38,11 +38,11 @@ public class DashScopeTextGenerator(
     {
         var parameters = new TextGenerationParameters
         {
-            TopP = (float)options.TopP,
-            Temperature = (float)options.Temperature,
+            TopP = options.TopP == 0 ? null : (float)options.TopP,
+            Temperature = options.Temperature == 0 ? null : (float)options.Temperature,
             RepetitionPenalty =
-                (float)options.FrequencyPenalty + 1, // dashScope's default value is 1.0, kernel memory is 0.0
-            MaxTokens = options.MaxTokens,
+                options.FrequencyPenalty == 0 ? null : ((float)options.FrequencyPenalty + 1), // dashScope's default value is 1.0, kernel memory is 0.0
+            MaxTokens = options.MaxTokens == 0 ? null : options.MaxTokens,
             Stop = options.StopSequences.ToArray(),
             IncrementalOutput = true,
             ResultFormat = ResultFormats.Text
