@@ -1,4 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk;
+﻿using Cnblogs.DashScope.Core;
 using Cnblogs.KernelMemory.AI.DashScope;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;

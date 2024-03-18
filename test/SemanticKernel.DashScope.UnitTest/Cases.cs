@@ -1,4 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk;
+﻿using Cnblogs.DashScope.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -19,7 +19,7 @@ public static class Cases
 
     public static readonly IConfiguration Configuration =
         new ConfigurationBuilder().AddInMemoryCollection(
-            new Dictionary<string, string?>()
+            new Dictionary<string, string?>
             {
                 { "dashScope:apiKey", ApiKey },
                 { "dashScope:chatCompletionModelId", ModelId },
@@ -52,6 +52,90 @@ public static class Cases
         RequestId = "1773f7b2-2148-9f74-b335-b413e398a116",
         Usage = new(3)
     };
+
+    public static KernelFunction NormalFunction(Action method)
+        => KernelFunctionFactory.CreateFromMethod(
+            (string location) =>
+            {
+                method();
+                return "Weather";
+            },
+            "GetCurrentWeather");
+
+    public static KernelFunction AlterFunction(Action method)
+        => KernelFunctionFactory.CreateFromMethod(
+            (string location) =>
+            {
+                method();
+                return "Weather";
+            },
+            "GetCurrentWeatherAlter");
+
+    public static KernelPlugin Plugin(params KernelFunction[] functions)
+        => KernelPluginFactory.CreateFromFunctions("MyPlugin", functions);
+
+    public static ModelResponse<TextGenerationOutput, TextGenerationTokenUsage> ErrToolCallResponse(
+        KernelFunction[] functions,
+        string toolType = "function",
+        string pluginName = "MyPlugin",
+        string paramBody = "{\"location\": \"LA\"}")
+        => new()
+        {
+            Output = new()
+            {
+                Choices =
+                [
+                    new()
+                    {
+                        FinishReason = "tool_call",
+                        Message = new(
+                            "assistant",
+                            string.Empty,
+                            ToolCalls: functions.Select(
+                                (f, i) => new ToolCall(
+                                    $"{i}",
+                                    toolType,
+                                    new($"{pluginName}-{f.Name}", paramBody))).ToList())
+                    }
+                ]
+            },
+            Usage = new()
+            {
+                InputTokens = 10,
+                OutputTokens = 30,
+                TotalTokens = 40
+            }
+        };
+
+    public static ModelResponse<TextGenerationOutput, TextGenerationTokenUsage>
+        ToolCallResponse(params KernelFunction[] functions)
+        => new()
+        {
+            Output = new()
+            {
+                Choices =
+                [
+                    new()
+                    {
+                        FinishReason = "tool_call",
+                        Message = new(
+                            "assistant",
+                            string.Empty,
+                            ToolCalls: functions.Select(
+                                f => new ToolCall(
+                                    "0",
+                                    "function",
+                                    new($"MyPlugin-{f.Name}", "{\"location\": \"LA\"}"))).ToList())
+                    }
+                ]
+            },
+            Usage = new()
+            {
+                InputTokens = 10,
+                OutputTokens = 30,
+                TotalTokens = 40
+            }
+        };
 
     public static readonly ModelResponse<TextGenerationOutput, TextGenerationTokenUsage> ChatGenerationResponse = new()
     {

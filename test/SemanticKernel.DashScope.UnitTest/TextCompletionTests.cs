@@ -1,6 +1,7 @@
-﻿using Cnblogs.DashScope.Sdk;
+﻿using Cnblogs.DashScope.Core;
 using Cnblogs.SemanticKernel.Connectors.DashScope;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.SemanticKernel;
 using NSubstitute;
 using NSubstitute.Extensions;
@@ -18,7 +19,10 @@ public class TextCompletionTests
         dashScopeClient.Configure()
             .GetTextCompletionAsync(Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>())
             .Returns(Task.FromResult(Cases.TextGenerationResponse));
-        var service = new DashScopeChatCompletionService(Cases.ModelId, dashScopeClient);
+        var service = new DashScopeChatCompletionService(
+            Cases.ModelId,
+            dashScopeClient,
+            NullLogger<DashScopeChatCompletionService>.Instance);
 
         // Act
         var response = await service.GetTextContentsAsync(Cases.Prompt, settings);
@@ -47,8 +51,11 @@ public class TextCompletionTests
         dashScopeClient.Configure()
             .GetTextCompletionAsync(Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>())
             .Returns(Task.FromResult(Cases.TextGenerationResponse));
-        var service = new DashScopeChatCompletionService(Cases.ModelId, dashScopeClient);
-        var settings = new DashScopePromptExecutionSettings() { ModelId = Cases.ModelIdAlter };
+        var service = new DashScopeChatCompletionService(
+            Cases.ModelId,
+            dashScopeClient,
+            NullLogger<DashScopeChatCompletionService>.Instance);
+        var settings = new DashScopePromptExecutionSettings { ModelId = Cases.ModelIdAlter };
 
         // Act
         _ = await service.GetTextContentsAsync(Cases.Prompt, settings);
@@ -68,7 +75,10 @@ public class TextCompletionTests
         dashScopeClient.Configure()
             .GetTextCompletionStreamAsync(Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>())
             .Returns(list.ToAsyncEnumerable());
-        var service = new DashScopeChatCompletionService(Cases.ModelId, dashScopeClient);
+        var service = new DashScopeChatCompletionService(
+            Cases.ModelId,
+            dashScopeClient,
+            NullLogger<DashScopeChatCompletionService>.Instance);
 
         // Act
         var response = await service.GetStreamingTextContentsAsync(Cases.Prompt, settings).ToListAsync();
@@ -98,7 +108,10 @@ public class TextCompletionTests
         dashScopeClient.Configure()
             .GetTextCompletionStreamAsync(Arg.Any<ModelRequest<TextGenerationInput, ITextGenerationParameters>>())
             .Returns(list.ToAsyncEnumerable());
-        var service = new DashScopeChatCompletionService(Cases.ModelId, dashScopeClient);
+        var service = new DashScopeChatCompletionService(
+            Cases.ModelId,
+            dashScopeClient,
+            NullLogger<DashScopeChatCompletionService>.Instance);
         var settings = new PromptExecutionSettings { ModelId = Cases.ModelIdAlter };
 
         // Act
@@ -114,6 +127,6 @@ public class TextCompletionTests
         {
             null,
             new DashScopePromptExecutionSettings { Seed = 1000 },
-            new PromptExecutionSettings { ExtensionData = new Dictionary<string, object>() { { "seed", 1000 } } }
+            new PromptExecutionSettings { ExtensionData = new Dictionary<string, object> { { "seed", 1000 } } }
         };
 }

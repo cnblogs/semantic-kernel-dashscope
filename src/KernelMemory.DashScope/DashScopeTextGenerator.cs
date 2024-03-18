@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using Cnblogs.DashScope.Sdk;
+using Cnblogs.DashScope.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.KernelMemory.AI;
 using Microsoft.KernelMemory.Diagnostics;
