@@ -1,7 +1,8 @@
-﻿using Cnblogs.DashScope.Sdk;
+﻿using Cnblogs.DashScope.Core;
 using Cnblogs.SemanticKernel.Connectors.DashScope;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.TextGeneration;
@@ -91,10 +92,16 @@ public static class DashScopeServiceCollectionExtensions
     {
         services.AddKeyedSingleton<ITextGenerationService, DashScopeChatCompletionService>(
             serviceId,
-            (_, _) => new DashScopeChatCompletionService(modelId, new DashScopeClient(apiKey)));
+            (sp, _) => new DashScopeChatCompletionService(
+                modelId,
+                new DashScopeClient(apiKey),
+                sp.GetRequiredService<ILogger<DashScopeChatCompletionService>>()));
         return services.AddKeyedSingleton<IChatCompletionService, DashScopeChatCompletionService>(
             serviceId,
-            (_, _) => new DashScopeChatCompletionService(modelId, new DashScopeClient(apiKey)));
+            (sp, _) => new DashScopeChatCompletionService(
+                modelId,
+                new DashScopeClient(apiKey),
+                sp.GetRequiredService<ILogger<DashScopeChatCompletionService>>()));
     }
 
     #endregion

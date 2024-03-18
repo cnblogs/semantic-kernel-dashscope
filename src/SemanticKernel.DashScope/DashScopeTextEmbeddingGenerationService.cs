@@ -1,5 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk;
-using Cnblogs.DashScope.Sdk.TextEmbedding;
+﻿using Cnblogs.DashScope.Core;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
 using Microsoft.SemanticKernel.Services;
@@ -34,7 +33,12 @@ public class DashScopeTextEmbeddingGenerationService : ITextEmbeddingGenerationS
         CancellationToken cancellationToken = new())
     {
         var result = new List<ReadOnlyMemory<float>>(data.Count);
-        var embeddings = await _client.GetTextEmbeddingsAsync(_modelId, data, null, cancellationToken);
+        var embeddings = await _client.GetEmbeddingsAsync(
+            new ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>
+            {
+                Model = _modelId, Input = new TextEmbeddingInput { Texts = data }
+            },
+            cancellationToken);
         if (embeddings.Output.Embeddings.Count != data.Count)
         {
             throw new KernelException(

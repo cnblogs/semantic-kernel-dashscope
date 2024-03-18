@@ -19,8 +19,8 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-    <PackageReference Include="Cnblogs.DashScope.Sdk" Version="0.0.3"/>
-    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.5.0" />
+    <PackageReference Include="Cnblogs.DashScope.Core" Version="0.2.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.6.2" />
   </ItemGroup>
 
   <ItemGroup>

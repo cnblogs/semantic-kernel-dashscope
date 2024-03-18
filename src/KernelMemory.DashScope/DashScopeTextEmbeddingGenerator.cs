@@ -1,5 +1,4 @@
-﻿using Cnblogs.DashScope.Sdk;
-using Cnblogs.DashScope.Sdk.TextEmbedding;
+﻿using Cnblogs.DashScope.Core;
 using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.AI;
 
@@ -30,7 +29,13 @@ public class DashScopeTextEmbeddingGenerator(
         string text,
         CancellationToken cancellationToken = new())
     {
-        var result = await dashScopeClient.GetTextEmbeddingsAsync(modelId, [text], null, cancellationToken);
+        var result = await dashScopeClient.GetEmbeddingsAsync(
+            new ModelRequest<TextEmbeddingInput, ITextEmbeddingParameters>
+            {
+                Input = new TextEmbeddingInput { Texts = [text] },
+                Model = modelId
+            },
+            cancellationToken);
         return result.Output.Embeddings[0].Embedding;
     }
 

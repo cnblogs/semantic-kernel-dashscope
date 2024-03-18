@@ -17,6 +17,7 @@ public class ServiceCollectionExtensionsTests
     {
         // Arrange
         var builder = Kernel.CreateBuilder();
+        builder.Services.AddLogging();
 
         // Act
         _ = type switch
