@@ -12,7 +12,7 @@ dotnet add package Cnblogs.SemanticKernel.Connectors.DashScope
 using Microsoft.SemanticKernel;
 
 var builder = Kernel.CreateBuilder();
-builder.Services.AddDashScopeChatCompletion("your-api-key", "qwen-max");
+builder.Services.AddLogging().AddDashScopeChatCompletion("your-api-key", "qwen-max");
 var kernel = builder.Build();
 
 var prompt = "<message role=\"user\">Tell me about the Cnblogs</message>";
