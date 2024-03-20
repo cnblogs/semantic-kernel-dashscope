@@ -1,4 +1,4 @@
-﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core;
 using Cnblogs.SemanticKernel.Connectors.DashScope;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -95,13 +95,13 @@ public static class DashScopeServiceCollectionExtensions
             (sp, _) => new DashScopeChatCompletionService(
                 modelId,
                 new DashScopeClient(apiKey),
-                sp.GetRequiredService<ILogger<DashScopeChatCompletionService>>()));
+                sp.GetService<ILoggerFactory>()));
         return services.AddKeyedSingleton<IChatCompletionService, DashScopeChatCompletionService>(
             serviceId,
             (sp, _) => new DashScopeChatCompletionService(
                 modelId,
                 new DashScopeClient(apiKey),
-                sp.GetRequiredService<ILogger<DashScopeChatCompletionService>>()));
+                sp.GetService<ILoggerFactory>()));
     }
 
     #endregion

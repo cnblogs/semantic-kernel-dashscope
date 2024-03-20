@@ -1,7 +1,8 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Cnblogs.DashScope.Core;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Services;
@@ -17,22 +18,24 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService, ITe
     private readonly IDashScopeClient _dashScopeClient;
     private readonly Dictionary<string, object?> _attributes = new();
     private readonly string _modelId;
-    private readonly ILogger<DashScopeChatCompletionService> _logger;
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Creates a new DashScope chat completion service.
     /// </summary>
     /// <param name="modelId"></param>
     /// <param name="dashScopeClient"></param>
-    /// <param name="logger"></param>
+    /// <param name="loggerFactory"></param>
     public DashScopeChatCompletionService(
         string modelId,
         IDashScopeClient dashScopeClient,
-        ILogger<DashScopeChatCompletionService> logger)
+        ILoggerFactory? loggerFactory = null)
     {
         _dashScopeClient = dashScopeClient;
         _modelId = modelId;
-        _logger = logger;
+        _logger = loggerFactory != null
+            ? loggerFactory.CreateLogger<DashScopeChatCompletionService>()
+            : NullLogger.Instance;
         _attributes.Add(AIServiceExtensions.ModelIdKey, _modelId);
     }
 
@@ -50,7 +53,7 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService, ITe
         chatParameters.ToolCallBehavior?.ConfigureOptions(kernel, chatParameters);
 
         var autoInvoke = kernel is not null && chatParameters.ToolCallBehavior?.MaximumAutoInvokeAttempts > 0;
-        for (var it = 1;; it++)
+        for (var it = 1; ; it++)
         {
             var response = await _dashScopeClient.GetTextCompletionAsync(
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>

@@ -1,11 +1,10 @@
-﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core;
 using Cnblogs.SemanticKernel.Connectors.DashScope;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using NSubstitute;
-using NSubstitute.Core;
 using NSubstitute.Extensions;
 
 namespace SemanticKernel.DashScope.UnitTest;
@@ -24,7 +23,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
 
         // Act
         var response = await service.GetChatMessageContentsAsync(Cases.ChatHistory, settings);
@@ -60,7 +59,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
         var settings =
             new DashScopePromptExecutionSettings { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
         var history = new ChatHistory();
@@ -94,7 +93,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
         var settings =
             new DashScopePromptExecutionSettings { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
         var history = new ChatHistory();
@@ -124,7 +123,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
         var settings =
             new DashScopePromptExecutionSettings { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
         var history = new ChatHistory();
@@ -154,7 +153,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
         var settings =
             new DashScopePromptExecutionSettings { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
         var history = new ChatHistory();
@@ -185,7 +184,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
         var settings =
             new DashScopePromptExecutionSettings { ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions };
         var history = new ChatHistory();
@@ -218,7 +217,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
         var settings =
             new DashScopePromptExecutionSettings
             {
@@ -252,7 +251,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
         var settings =
             new DashScopePromptExecutionSettings
             {
@@ -279,7 +278,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
         var settings = new DashScopePromptExecutionSettings { ModelId = Cases.ModelIdAlter };
 
         // Act
@@ -303,7 +302,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
 
         // Act
         var response = await service.GetStreamingChatMessageContentsAsync(Cases.ChatHistory, settings).ToListAsync();
@@ -336,7 +335,7 @@ public class ChatCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            MockLoggerFactory.MockLogger<DashScopeChatCompletionService>());
+            NullLoggerFactory.Instance);
         var settings = new DashScopePromptExecutionSettings { ModelId = Cases.ModelIdAlter };
 
         // Act
