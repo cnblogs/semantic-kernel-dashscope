@@ -1,4 +1,4 @@
-﻿using Cnblogs.DashScope.Core;
+using Cnblogs.DashScope.Core;
 using Cnblogs.SemanticKernel.Connectors.DashScope;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -22,7 +22,7 @@ public class TextCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            NullLogger<DashScopeChatCompletionService>.Instance);
+            NullLoggerFactory.Instance);
 
         // Act
         var response = await service.GetTextContentsAsync(Cases.Prompt, settings);
@@ -54,7 +54,7 @@ public class TextCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            NullLogger<DashScopeChatCompletionService>.Instance);
+            NullLoggerFactory.Instance);
         var settings = new DashScopePromptExecutionSettings { ModelId = Cases.ModelIdAlter };
 
         // Act
@@ -78,7 +78,7 @@ public class TextCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            NullLogger<DashScopeChatCompletionService>.Instance);
+            NullLoggerFactory.Instance);
 
         // Act
         var response = await service.GetStreamingTextContentsAsync(Cases.Prompt, settings).ToListAsync();
@@ -111,7 +111,7 @@ public class TextCompletionTests
         var service = new DashScopeChatCompletionService(
             Cases.ModelId,
             dashScopeClient,
-            NullLogger<DashScopeChatCompletionService>.Instance);
+            NullLoggerFactory.Instance);
         var settings = new PromptExecutionSettings { ModelId = Cases.ModelIdAlter };
 
         // Act
