@@ -230,7 +230,7 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService, ITe
         {
             yield return new StreamingTextContent(
                 response.Output.Text,
-                modelId: _modelId,
+                modelId: string.IsNullOrEmpty(parameters.ModelId) ? _modelId : parameters.ModelId,
                 metadata: response.ToMetaData());
         }
     }
