@@ -12,7 +12,7 @@ public static class Cases
 
     public static readonly TextGenerationOptions TextGenerationOptions = new()
     {
-        TopP = 0.8,
+        NucleusSampling = 0.8,
         FrequencyPenalty = 0.1,
         MaxTokens = 1000,
         PresencePenalty = 0,
