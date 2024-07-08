@@ -38,7 +38,7 @@ public class DashScopeTextGenerator(
     {
         var parameters = new TextGenerationParameters
         {
-            TopP = options.TopP == 0 ? null : (float)options.TopP,
+            TopP = options.NucleusSampling == 0 ? null : (float)options.NucleusSampling,
             Temperature = options.Temperature == 0 ? null : (float)options.Temperature,
             RepetitionPenalty =
                 options.FrequencyPenalty == 0 ? null : ((float)options.FrequencyPenalty + 1), // dashScope's default value is 1.0, kernel memory is 0.0

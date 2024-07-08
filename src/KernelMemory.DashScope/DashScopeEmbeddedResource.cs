@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using Microsoft.KernelMemory.Configuration;
+using Microsoft.KernelMemory;
 
 namespace Cnblogs.KernelMemory.AI.DashScope;
 
