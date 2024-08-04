@@ -31,6 +31,12 @@ public class DashScopeTextGenerator(
     }
 
     /// <inheritdoc />
+    public IReadOnlyList<string> GetTokens(string text)
+    {
+        return tokenizer?.GetTokens(text) ?? QWenTokenizer.GetTokensStatic(text);
+    }
+
+    /// <inheritdoc />
     public async IAsyncEnumerable<string> GenerateTextAsync(
         string prompt,
         TextGenerationOptions options,

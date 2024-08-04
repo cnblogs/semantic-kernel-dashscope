@@ -25,6 +25,12 @@ public class DashScopeTextEmbeddingGenerator(
     }
 
     /// <inheritdoc />
+    public IReadOnlyList<string> GetTokens(string text)
+    {
+        return tokenizer?.GetTokens(text) ?? [text];
+    }
+
+    /// <inheritdoc />
     public async Task<Embedding> GenerateEmbeddingAsync(
         string text,
         CancellationToken cancellationToken = new())
