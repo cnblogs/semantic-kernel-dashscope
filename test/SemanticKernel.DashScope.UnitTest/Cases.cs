@@ -55,7 +55,7 @@ public static class Cases
 
     public static KernelFunction NormalFunction(Action method)
         => KernelFunctionFactory.CreateFromMethod(
-            (string location) =>
+            (string _) =>
             {
                 method();
                 return "Weather";
