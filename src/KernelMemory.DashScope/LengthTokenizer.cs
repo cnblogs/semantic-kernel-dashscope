@@ -12,4 +12,10 @@ public class LengthTokenizer : ITextTokenizer
     {
         return text.Length;
     }
+
+    /// <inheritdoc />
+    public IReadOnlyList<string> GetTokens(string text)
+    {
+        return text.Select(x => $"{x}").ToList();
+    }
 }

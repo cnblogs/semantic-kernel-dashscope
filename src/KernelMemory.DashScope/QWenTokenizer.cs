@@ -13,7 +13,6 @@ public class QWenTokenizer : ITextTokenizer
         .Concat(Enumerable.Range(0, 205).Select(x => $"<|extra_{x}|>"))
         .Select((x, i) => new KeyValuePair<string, int>(x, 151643 + i))
         .ToDictionary();
-
     private static readonly ITokenizer Tokenizer = TokenizerBuilder.CreateTokenizer(
         DashScopeEmbeddedResource.ReadBpeFile(),
         SpecialTokens,
@@ -45,6 +44,12 @@ public class QWenTokenizer : ITextTokenizer
         return Tokenizer.Encode(text).Count;
     }
 
+    /// <inheritdoc />
+    public IReadOnlyList<string> GetTokens(string text)
+    {
+        return Tokenizer.Encode(text).Select(x => Tokenizer.Decode([x])).ToList();
+    }
+
     /// <summary>
     /// Count tokens.
     /// </summary>
@@ -53,5 +58,15 @@ public class QWenTokenizer : ITextTokenizer
     public static int CountTokensStatic(string text)
     {
         return Tokenizer.Encode(text).Count;
+    }
+
+    /// <summary>
+    /// Get tokens
+    /// </summary>
+    /// <param name="text">The text to tokenizers.</param>
+    /// <returns></returns>
+    public static IReadOnlyList<string> GetTokensStatic(string text)
+    {
+        return Tokenizer.Encode(text).Select(x => Tokenizer.Decode([x])).ToList();
     }
 }
