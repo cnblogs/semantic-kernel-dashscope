@@ -15,7 +15,7 @@ public class DashScopeTextEmbeddingGenerator(
     IDashScopeClient dashScopeClient,
     string modelId,
     ITextTokenizer? tokenizer = null,
-    int maxTokens = 2048)
+    int maxTokens = 8192)
     : ITextEmbeddingGenerator
 {
     /// <inheritdoc />

@@ -17,8 +17,8 @@ public static class DependencyInjector
     private const string DefaultTextModel = "qwen-max";
     private const int DefaultTextModelMaxToken = 6000;
 
-    private const string DefaultEmbeddingModel = "text-embedding-v2";
-    private const int DefaultEmbeddingModelMaxToken = 2048;
+    private const string DefaultEmbeddingModel = "text-embedding-v3";
+    private const int DefaultEmbeddingModelMaxToken = 8192;
 
     /// <summary>
     /// Use default DashScope models (qwen-max and text-embedding-v2) and settings for ingestion and retrieval.
