@@ -37,7 +37,7 @@ Install Nuget package `Microsoft.KernelMemory.SemanticKernelPlugin`
   "dashScope": {
     "apiKey": "your-key",
     "chatCompletionModelId": "qwen-max",
-    "textEmbeddingModelId": "text-embedding-v2"
+    "textEmbeddingModelId": "text-embedding-v3"
   }
 }
 ```
