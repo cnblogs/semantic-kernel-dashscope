@@ -18,14 +18,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Cnblogs.DashScope.Core" Version="0.4.0" />
     <PackageReference Include="JsonSchema.Net.Generation" Version="4.5.1" />
-    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.24.1" />
+    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.30.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="../../README.md" Pack="true" PackagePath="\"/>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
