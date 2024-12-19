@@ -55,6 +55,7 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService, ITe
         var autoInvoke = kernel is not null && chatParameters.ToolCallBehavior?.MaximumAutoInvokeAttempts > 0;
         for (var it = 1; ; it++)
         {
+            var chatParametersTools = chatParameters.Tools?.ToList();
             var response = await _dashScopeClient.GetTextCompletionAsync(
                 new ModelRequest<TextGenerationInput, ITextGenerationParameters>
                 {
@@ -83,14 +84,14 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService, ITe
 
             foreach (var call in message.ToolCalls)
             {
-                if (call.Type is not ToolTypes.Function || call.Function is null)
+                if (call.Type is not ToolTypes.Function)
                 {
                     AddResponseMessage(chat, null, "Error: Tool call was not a function call.", call.Id);
                     continue;
                 }
 
                 // ensure not calling function that was not included in request list.
-                if (chatParameters.Tools?.Any(
+                if (chatParametersTools?.Any(
                         x => string.Equals(x.Function?.Name, call.Function.Name, StringComparison.OrdinalIgnoreCase))
                     != true)
                 {
@@ -133,7 +134,7 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService, ITe
                 AddResponseMessage(chat, stringResult, null, call.Id);
             }
 
-            chatParameters.Tools?.Clear();
+            chatParameters.Tools = [];
             chatParameters.ToolCallBehavior?.ConfigureOptions(kernel, chatParameters);
             if (it >= chatParameters.ToolCallBehavior!.MaximumAutoInvokeAttempts)
             {
@@ -273,7 +274,7 @@ public sealed class DashScopeChatCompletionService : IChatCompletionService, ITe
         {
             _logger.LogTrace(
                 "Function call requests: {Requests}",
-                string.Join(", ", calls.Select(ftc => $"{ftc.Function?.Name}({ftc.Function?.Arguments})")));
+                string.Join(", ", calls.Select(ftc => $"{ftc.Function.Name}({ftc.Function.Arguments})")));
         }
     }
 

@@ -27,10 +27,16 @@ public class DashScopePromptExecutionSettings : PromptExecutionSettings, ITextGe
     public string? ResultFormat { get; set; }
 
     /// <inheritdoc />
+    public DashScopeResponseFormat? ResponseFormat { get; }
+
+    /// <inheritdoc />
     public int? MaxTokens { get; set; }
 
     /// <inheritdoc />
     public float? RepetitionPenalty { get; set; }
+
+    /// <inheritdoc />
+    public float? PresencePenalty { get; }
 
     /// <inheritdoc />
     public float? Temperature { get; set; }
@@ -42,7 +48,10 @@ public class DashScopePromptExecutionSettings : PromptExecutionSettings, ITextGe
     public bool? EnableSearch { get; set; }
 
     /// <inheritdoc />
-    public List<ToolDefinition>? Tools { get; internal set; }
+    public ToolChoice? ToolChoice { get; }
+
+    /// <inheritdoc />
+    public IEnumerable<ToolDefinition>? Tools { get; set; }
 
     /// <summary>
     /// Gets or sets the behavior for how tool calls are handled.
