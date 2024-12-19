@@ -95,6 +95,7 @@ public static class Cases
                                 (f, i) => new ToolCall(
                                     $"{i}",
                                     toolType,
+                                    i,
                                     new($"{pluginName}-{f.Name}", paramBody))).ToList())
                     }
                 ]
@@ -125,6 +126,7 @@ public static class Cases
                                 f => new ToolCall(
                                     "0",
                                     "function",
+                                    0,
                                     new($"MyPlugin-{f.Name}", "{\"location\": \"LA\"}"))).ToList())
                     }
                 ]
