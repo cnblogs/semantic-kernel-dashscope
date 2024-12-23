@@ -47,7 +47,7 @@ public class DashScopeTextEmbeddingGeneratorTests
     {
         // Arrange
         var client = Substitute.For<IDashScopeClient>();
-        var generator = new DashScopeTextEmbeddingGenerator(client, Cases.ModelId, tokenizer: new QWenTokenizer());
+        var generator = new DashScopeTextEmbeddingGenerator(client, Cases.ModelId, tokenizer: new QWenTextTokenizer());
 
         // Act
         var count = generator.CountTokens(Cases.Text);

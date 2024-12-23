@@ -22,18 +22,19 @@ public class DashScopeTextGenerator(
     int maxToken = 6000) : ITextGenerator
 {
     private readonly ILogger<DashScopeTextGenerator> _logger = loggerFactory?.CreateLogger<DashScopeTextGenerator>()
-                                                                ?? DefaultLogger<DashScopeTextGenerator>.Instance;
+                                                               ?? DefaultLogger<DashScopeTextGenerator>.Instance;
 
     /// <inheritdoc />
     public int CountTokens(string text)
     {
-        return tokenizer?.CountTokens(text) ?? QWenTokenizer.CountTokensStatic(text);
+        return tokenizer?.CountTokens(text) ?? QWenTokenizer.CountTokens(text);
     }
 
     /// <inheritdoc />
     public IReadOnlyList<string> GetTokens(string text)
     {
-        return tokenizer?.GetTokens(text) ?? QWenTokenizer.GetTokensStatic(text);
+        return tokenizer?.GetTokens(text)
+               ?? QWenTokenizer.Tokenizer.EncodeToTokens(text, out _).Select(x => x.Value).ToList();
     }
 
     /// <inheritdoc />
@@ -47,7 +48,9 @@ public class DashScopeTextGenerator(
             TopP = options.NucleusSampling == 0 ? null : (float)options.NucleusSampling,
             Temperature = options.Temperature == 0 ? null : (float)options.Temperature,
             RepetitionPenalty =
-                options.FrequencyPenalty == 0 ? null : ((float)options.FrequencyPenalty + 1), // dashScope's default value is 1.0, kernel memory is 0.0
+                options.FrequencyPenalty == 0
+                    ? null
+                    : ((float)options.FrequencyPenalty + 1), // dashScope's default value is 1.0, kernel memory is 0.0
             MaxTokens = options.MaxTokens == 0 ? null : options.MaxTokens,
             Stop = options.StopSequences.ToArray(),
             IncrementalOutput = true,

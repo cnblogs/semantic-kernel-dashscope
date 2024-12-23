@@ -36,7 +36,7 @@ public static class DependencyInjector
         ITextTokenizer? textEmbeddingTokenizer = null,
         bool onlyForRetrieval = false)
     {
-        textGenerationTokenizer ??= new QWenTokenizer();
+        textGenerationTokenizer ??= new QWenTextTokenizer();
         textEmbeddingTokenizer ??= new LengthTokenizer();
 
         var config = new DashScopeConfig
@@ -97,7 +97,7 @@ public static class DependencyInjector
     {
         config.EnsureValid();
         embeddingTokenizer ??= new LengthTokenizer();
-        textTokenizer ??= new QWenTokenizer();
+        textTokenizer ??= new QWenTextTokenizer();
         dashScopeClient ??= new DashScopeClient(config.ApiKey);
         builder.WithDashScopeTextGeneration(config, textTokenizer, dashScopeClient);
         builder.WithDashScopeTextEmbeddingGeneration(config, embeddingTokenizer, onlyForRetrieval, dashScopeClient);
@@ -119,7 +119,7 @@ public static class DependencyInjector
         IDashScopeClient? dashScopeClient = null)
     {
         config.EnsureValid();
-        tokenizer ??= new QWenTokenizer();
+        tokenizer ??= new QWenTextTokenizer();
         dashScopeClient ??= new DashScopeClient(config.ApiKey);
         builder.Services.AddDashScopeTextGeneration(config, tokenizer, dashScopeClient);
         return builder;
@@ -188,7 +188,7 @@ public static class DependencyInjector
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/>.</param>
     /// <param name="config">Settings for DashScope.</param>
-    /// <param name="tokenizer">The tokenizer to use, defaults to <see cref="QWenTokenizer"/>.</param>
+    /// <param name="tokenizer">The tokenizer to use, defaults to <see cref="QWenTextTokenizer"/>.</param>
     /// <param name="dashScopeClient">The underlying <see cref="IDashScopeClient"/>.</param>
     /// <returns></returns>
     public static IServiceCollection AddDashScopeTextGeneration(
@@ -198,7 +198,7 @@ public static class DependencyInjector
         IDashScopeClient? dashScopeClient = null)
     {
         config.EnsureValid();
-        tokenizer ??= new QWenTokenizer();
+        tokenizer ??= new QWenTextTokenizer();
 
         return services.AddSingleton<ITextGenerator>(
             sp => new DashScopeTextGenerator(
