@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Cnblogs.DashScope.Core" Version="0.5.1" />
+    <PackageReference Include="Cnblogs.DashScope.Core" Version="0.5.2" />
     <PackageReference Include="JsonSchema.Net.Generation" Version="4.6.0" />
     <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.32.0" />
   </ItemGroup>
