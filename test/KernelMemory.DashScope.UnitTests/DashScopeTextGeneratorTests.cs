@@ -26,7 +26,7 @@ public class DashScopeTextGeneratorTests
         var response = await generator.GenerateTextAsync(Cases.Text, Cases.TextGenerationOptions).ToListAsync();
 
         // Assert
-        response[0].Should().BeSameAs(
+        response[0].Text.Should().BeSameAs(
             Cases.TextGenerationResponse.Output.Text,
             "generated text should mapped from output.text");
         captured.Should().BeEquivalentTo(
@@ -51,7 +51,7 @@ public class DashScopeTextGeneratorTests
         var response = await generator.GenerateTextAsync(Cases.Text, Cases.TextGenerationOptions).ToListAsync();
 
         // Assert
-        response[0].Should().BeSameAs(
+        response[0].Text.Should().BeSameAs(
             Cases.TextGenerationResponse.Output.Text,
             "generated text should mapped from output.text");
         captured.Should().BeEquivalentTo(

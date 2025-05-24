@@ -72,11 +72,6 @@ public class DashScopeTextGenerator(
         var tokens = dashScopeClient.GetTextCompletionStreamAsync(request, cancellationToken);
         await foreach (var token in tokens)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                break;
-            }
-
             yield return new GeneratedTextContent(
                 token.Output.Text ?? string.Empty,
                 token.Usage.ToKernelMemoryTokenUsage(modelId));
