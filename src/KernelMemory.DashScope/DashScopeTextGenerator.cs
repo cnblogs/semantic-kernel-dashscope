@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Cnblogs.DashScope.Core;
 using Microsoft.Extensions.Logging;
+using Microsoft.KernelMemory;
 using Microsoft.KernelMemory.AI;
 using Microsoft.KernelMemory.Diagnostics;
 
@@ -38,7 +39,7 @@ public class DashScopeTextGenerator(
     }
 
     /// <inheritdoc />
-    public async IAsyncEnumerable<string> GenerateTextAsync(
+    public async IAsyncEnumerable<GeneratedTextContent> GenerateTextAsync(
         string prompt,
         TextGenerationOptions options,
         [EnumeratorCancellation] CancellationToken cancellationToken = new())
@@ -71,7 +72,14 @@ public class DashScopeTextGenerator(
         var tokens = dashScopeClient.GetTextCompletionStreamAsync(request, cancellationToken);
         await foreach (var token in tokens)
         {
-            yield return token.Output.Text!;
+            if (cancellationToken.IsCancellationRequested)
+            {
+                break;
+            }
+
+            yield return new GeneratedTextContent(
+                token.Output.Text ?? string.Empty,
+                token.Usage.ToKernelMemoryTokenUsage(modelId));
         }
     }
 

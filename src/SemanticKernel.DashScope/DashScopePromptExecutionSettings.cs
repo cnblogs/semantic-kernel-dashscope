@@ -51,6 +51,9 @@ public class DashScopePromptExecutionSettings : PromptExecutionSettings, ITextGe
     public ToolChoice? ToolChoice { get; }
 
     /// <inheritdoc />
+    public bool? ParallelToolCalls { get; set; }
+
+    /// <inheritdoc />
     public IEnumerable<ToolDefinition>? Tools { get; set; }
 
     /// <summary>
